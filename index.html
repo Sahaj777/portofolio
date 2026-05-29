@@ -376,6 +376,9 @@ nav#navbar.scrolled {
   transform: translateY(-7px) rotate(-45deg);
 }
 body.menu-open { overflow: hidden; }
+body.menu-open nav#navbar {
+  z-index: 950;
+}
 body.menu-open .fab-stack {
   opacity: 0;
   visibility: hidden;
@@ -2547,12 +2550,55 @@ footer nav.footer-links {
   opacity: 1;
   visibility: visible;
 }
+.mobile-nav-top {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: max(12px, env(safe-area-inset-top)) 16px 12px;
+  z-index: 2;
+}
+.mobile-nav-title {
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-3);
+  padding-left: 8px;
+}
+.mobile-nav-close {
+  width: 44px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--border-2);
+  border-radius: 50%;
+  background: var(--bg-3);
+  color: var(--text-0);
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: border-color 0.2s, background 0.2s;
+}
+.mobile-nav-close:hover {
+  border-color: var(--accent-1);
+  background: var(--bg-4);
+}
+.mobile-nav-close svg {
+  width: 20px;
+  height: 20px;
+  stroke: currentColor;
+}
 .mobile-nav-inner {
   width: 100%;
   max-width: 300px;
   display: flex;
   flex-direction: column;
   align-items: stretch;
+  margin: auto 0;
 }
 .mobile-nav-links {
   list-style: none;
@@ -2619,8 +2665,14 @@ footer nav.footer-links {
   </div>
 </nav>
 
-<!-- Mobile nav (close via header burger → X) -->
+<!-- Mobile nav -->
 <div class="mobile-nav" id="mobileNav" aria-hidden="true">
+  <div class="mobile-nav-top">
+    <span class="mobile-nav-title">Menu</span>
+    <button type="button" class="mobile-nav-close" id="mobileNavClose" aria-label="Close menu">
+      <svg fill="none" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 18 18 6M6 6l12 12" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </button>
+  </div>
   <nav class="mobile-nav-inner" aria-label="Mobile navigation">
     <ul class="mobile-nav-links">
       <li><a href="#services" class="mobile-link">Services</a></li>
@@ -3823,6 +3875,7 @@ function openCalendly(e) {
     burgerBtnEl.setAttribute('aria-label', 'Open menu');
   }
   document.body.classList.remove('menu-open');
+  if (typeof setMobileNav === 'function') setMobileNav(false);
   if (typeof Calendly !== 'undefined') {
     Calendly.initPopupWidget({ url: CALENDLY_URL });
   } else {
@@ -3856,6 +3909,7 @@ function setMobileNav(open) {
 }
 if (burgerBtn && mobileNav) {
   burgerBtn.addEventListener('click', () => setMobileNav(!mobileNav.classList.contains('open')));
+  document.getElementById('mobileNavClose')?.addEventListener('click', () => setMobileNav(false));
   document.querySelectorAll('.mobile-link').forEach(link => {
     link.addEventListener('click', () => setMobileNav(false));
   });
