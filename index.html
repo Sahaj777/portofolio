@@ -342,18 +342,44 @@ nav#navbar.scrolled {
 .nav-burger {
   display: none;
   flex-direction: column;
+  justify-content: center;
   gap: 5px;
+  width: 44px;
+  height: 44px;
   cursor: pointer;
-  padding: 4px;
+  padding: 10px;
   background: none;
   border: none;
+  border-radius: var(--radius-md);
+  position: relative;
+  z-index: 930;
+  transition: background 0.2s;
 }
+.nav-burger:hover { background: var(--bg-3); }
 .nav-burger span {
   display: block;
-  width: 24px;
-  height: 1.5px;
-  background: var(--text-1);
-  transition: 0.3s;
+  width: 22px;
+  height: 2px;
+  background: var(--text-0);
+  border-radius: 1px;
+  transition: transform 0.3s var(--easing), opacity 0.2s;
+  transform-origin: center;
+}
+.nav-burger.is-active span:nth-child(1) {
+  transform: translateY(7px) rotate(45deg);
+}
+.nav-burger.is-active span:nth-child(2) {
+  opacity: 0;
+  transform: scaleX(0);
+}
+.nav-burger.is-active span:nth-child(3) {
+  transform: translateY(-7px) rotate(-45deg);
+}
+body.menu-open { overflow: hidden; }
+body.menu-open .fab-stack {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
 }
 
 /* ═══════════════════════════════════════
@@ -2476,10 +2502,7 @@ footer nav.footer-links {
     bottom: 0;
   }
 
-  .mobile-nav {
-    padding-top: env(safe-area-inset-top, 0px);
-    padding-bottom: env(safe-area-inset-bottom, 0px);
-  }
+  .mobile-nav a.mobile-link { font-size: 16px; padding: 10px 12px; }
 
   .ui-tools-row {
     padding: 20px 16px;
@@ -2507,33 +2530,60 @@ footer nav.footer-links {
   display: none;
   position: fixed;
   inset: 0;
-  background: rgba(0,0,0,0.95);
-  backdrop-filter: blur(20px);
-  z-index: 850;
+  z-index: 920;
+  background: rgba(0, 0, 0, 0.97);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 32px;
+  padding: max(88px, calc(64px + env(safe-area-inset-top))) 24px max(32px, env(safe-area-inset-bottom));
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.3s var(--easing), visibility 0.3s;
 }
-.mobile-nav.open { display: flex; }
-.mobile-nav a {
-  font-size: 28px;
-  font-weight: 600;
-  color: var(--text-1);
-  transition: color 0.2s;
-}
-.mobile-nav a:hover { color: var(--accent-2); }
-.mobile-nav-close {
-  position: absolute;
-  top: 20px;
-  right: 20px;
-  width: 40px; height: 40px;
+.mobile-nav.open {
   display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
+  opacity: 1;
+  visibility: visible;
 }
-.mobile-nav-close svg { width: 24px; height: 24px; stroke: var(--text-2); }
+.mobile-nav-inner {
+  width: 100%;
+  max-width: 300px;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+}
+.mobile-nav-links {
+  list-style: none;
+  margin: 0 0 20px;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.mobile-nav a.mobile-link {
+  display: block;
+  padding: 11px 14px;
+  font-size: 17px;
+  font-weight: 500;
+  letter-spacing: -0.02em;
+  color: var(--text-1);
+  text-align: center;
+  border-radius: var(--radius-md);
+  transition: color 0.2s, background 0.2s;
+}
+.mobile-nav a.mobile-link:hover,
+.mobile-nav a.mobile-link:active {
+  color: var(--text-0);
+  background: rgba(255, 255, 255, 0.06);
+}
+.mobile-nav-cta {
+  width: 100%;
+  justify-content: center;
+  font-size: 14px;
+  padding: 12px 20px;
+}
 </style>
 </head>
 <body>
@@ -2569,18 +2619,19 @@ footer nav.footer-links {
   </div>
 </nav>
 
-<!-- Mobile nav -->
-<div class="mobile-nav" id="mobileNav">
-  <div class="mobile-nav-close" id="navClose">
-    <svg fill="none" stroke-width="1.5" viewBox="0 0 24 24"><path d="M6 18L18 6M6 6l12 12" stroke-linecap="round" stroke-linejoin="round"/></svg>
-  </div>
-  <a href="#services" class="mobile-link">Services</a>
-  <a href="#portfolio" class="mobile-link">Projects</a>
-  <a href="#design" class="mobile-link">UI/UX</a>
-  <a href="#stack" class="mobile-link">Stack</a>
-  <a href="#about" class="mobile-link">About</a>
-  <a href="#contact" class="mobile-link">Contact</a>
-  <a href="https://calendly.com/sahajgodhani777/15min" class="btn btn-accent btn-lg" data-calendly>Book a Call →</a>
+<!-- Mobile nav (close via header burger → X) -->
+<div class="mobile-nav" id="mobileNav" aria-hidden="true">
+  <nav class="mobile-nav-inner" aria-label="Mobile navigation">
+    <ul class="mobile-nav-links">
+      <li><a href="#services" class="mobile-link">Services</a></li>
+      <li><a href="#portfolio" class="mobile-link">Projects</a></li>
+      <li><a href="#design" class="mobile-link">UI/UX</a></li>
+      <li><a href="#stack" class="mobile-link">Stack</a></li>
+      <li><a href="#about" class="mobile-link">About</a></li>
+      <li><a href="#contact" class="mobile-link">Contact</a></li>
+    </ul>
+    <a href="https://calendly.com/sahajgodhani777/15min" class="btn btn-accent mobile-nav-cta" data-calendly>Book a Call →</a>
+  </nav>
 </div>
 
 <main id="main-content">
@@ -3695,7 +3746,7 @@ footer nav.footer-links {
 <footer role="contentinfo">
   <div class="container footer-inner">
     <div class="footer-copy">
-      © 2026 Sahaj Godhani · AI Engineer · Surat, India
+      © 2023 Sahaj Godhani · AI Engineer · Surat, India
     </div>
     <nav class="footer-links" aria-label="Footer navigation">
       <a href="#services">Services</a>
@@ -3760,13 +3811,18 @@ const FORM_SUBMIT_URL = 'https://formsubmit.co/ajax/' + encodeURIComponent(CONTA
 
 function openCalendly(e) {
   if (e) e.preventDefault();
-  const mobileNav = document.getElementById('mobileNav');
-  const burgerBtn = document.getElementById('burgerBtn');
-  if (mobileNav) mobileNav.classList.remove('open');
-  if (burgerBtn) {
-    burgerBtn.setAttribute('aria-expanded', 'false');
-    burgerBtn.setAttribute('aria-label', 'Open menu');
+  const mobileNavEl = document.getElementById('mobileNav');
+  const burgerBtnEl = document.getElementById('burgerBtn');
+  if (mobileNavEl) {
+    mobileNavEl.classList.remove('open');
+    mobileNavEl.setAttribute('aria-hidden', 'true');
   }
+  if (burgerBtnEl) {
+    burgerBtnEl.classList.remove('is-active');
+    burgerBtnEl.setAttribute('aria-expanded', 'false');
+    burgerBtnEl.setAttribute('aria-label', 'Open menu');
+  }
+  document.body.classList.remove('menu-open');
   if (typeof Calendly !== 'undefined') {
     Calendly.initPopupWidget({ url: CALENDLY_URL });
   } else {
@@ -3788,18 +3844,25 @@ window.addEventListener('scroll', () => {
 // Mobile nav
 const burgerBtn = document.getElementById('burgerBtn');
 const mobileNav = document.getElementById('mobileNav');
-const navClose = document.getElementById('navClose');
 
 function setMobileNav(open) {
+  if (!mobileNav || !burgerBtn) return;
   mobileNav.classList.toggle('open', open);
+  burgerBtn.classList.toggle('is-active', open);
+  document.body.classList.toggle('menu-open', open);
+  mobileNav.setAttribute('aria-hidden', open ? 'false' : 'true');
   burgerBtn.setAttribute('aria-expanded', open ? 'true' : 'false');
   burgerBtn.setAttribute('aria-label', open ? 'Close menu' : 'Open menu');
 }
-burgerBtn.addEventListener('click', () => setMobileNav(!mobileNav.classList.contains('open')));
-navClose.addEventListener('click', () => setMobileNav(false));
-document.querySelectorAll('.mobile-link').forEach(link => {
-  link.addEventListener('click', () => setMobileNav(false));
-});
+if (burgerBtn && mobileNav) {
+  burgerBtn.addEventListener('click', () => setMobileNav(!mobileNav.classList.contains('open')));
+  document.querySelectorAll('.mobile-link').forEach(link => {
+    link.addEventListener('click', () => setMobileNav(false));
+  });
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && mobileNav.classList.contains('open')) setMobileNav(false);
+  });
+}
 
 // Scroll reveal
 const revealObserver = new IntersectionObserver((entries) => {
